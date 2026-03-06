@@ -70,6 +70,16 @@ def login(user: schemas.UsuarioCreate, db : db_dependency):
 @app.get("/producto/",response_model=list[schemas.ProductoResponse])
 def products( db : db_dependency,user: models.Usuario = Depends(get_current_user)):
     return db.query(models.Producto).filter(models.Producto.precio>0).all()
+
+@app.get("/producto/{id}", response_model=schemas.ProductoResponse)
+def devolverProd(id: int, db: db_dependency, user: models.Usuario = Depends(get_current_user)):
+    producto = db.query(models.Producto).filter(models.Producto.id == id).first()
+    
+    if not producto:
+        raise HTTPException(status_code=404, detail='producto no encontrado')
+    
+    return producto
+
 @app.post("/producto/",response_model=schemas.ProductoResponse)
 def products( 
              producto: schemas.ProductoCreate, 
